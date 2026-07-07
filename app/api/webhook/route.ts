@@ -114,7 +114,7 @@ export async function POST(request: Request) {
     // ── 5. Get AI response ──────────────────────────────────────────────
     let aiReply: string;
     try {
-      aiReply = await processLeadMessage(history, messageBody);
+      aiReply = await processLeadMessage(history, messageBody, conversation.id);
     } catch (aiError) {
       console.error("🤖 AI Agent Error:", aiError);
       aiReply =
