@@ -10,11 +10,13 @@
     "postinstall": "prisma generate",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "test:load": "node scripts/load-test.js",
+    "test:load:heavy": "node scripts/load-test.js http://localhost:3000 1000 20"
   },
   "dependencies": {
-    "@google/generative-ai": "^0.24.0",
     "@prisma/client": "^6.9.0",
+    "groq-sdk": "^0.12.0",
     "next": "^15.3.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
