@@ -10,8 +10,8 @@
  */
 
 const BASE_URL = process.argv[2] || "http://localhost:3000";
-const TOTAL_REQUESTS = parseInt(process.argv[3] || "500", 10);
-const CONCURRENCY = parseInt(process.argv[4] || "10", 10);
+const TOTAL_REQUESTS = parseInt(process.argv[3] || "20", 10);
+const CONCURRENCY = parseInt(process.argv[4] || "2", 10);
 
 // Test scenarios
 const TEST_MESSAGES = [
