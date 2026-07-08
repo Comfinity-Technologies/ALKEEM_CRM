@@ -1,0 +1,80 @@
+[
+  {
+    "id": "prop-1",
+    "title": "1-Bedroom Accommodation Available for Staff/Labor",
+    "location": "Al Riffa, Ras Al Khaimah",
+    "type": "Compound",
+    "price": "25,000 AED/year",
+    "bedrooms": "1",
+    "bathrooms": "1",
+    "size": "700 sqft",
+    "listed": "16 days ago",
+    "status": "Available",
+    "link": "https://www.propertyfinder.ae/en/plp/rent/compound-for-rent-ras-al-khaimah-al-riffa-105123769.html"
+  },
+  {
+    "id": "prop-2",
+    "title": "3-Bedroom Unit with own bathrooms - Al Riffa RAK",
+    "location": "Al Riffa, Ras Al Khaimah",
+    "type": "Villa",
+    "price": "55,000 AED/year",
+    "bedrooms": "3",
+    "bathrooms": "3",
+    "size": "1,200 sqft",
+    "listed": "16 days ago",
+    "status": "Available",
+    "link": "https://www.propertyfinder.ae/en/plp/rent/villa-for-rent-ras-al-khaimah-al-riffa-105124554.html"
+  },
+  {
+    "id": "prop-3",
+    "title": "Luxury 6-Bedroom Villa for Rent in Al Refaa, RAK",
+    "location": "Al Riffa, Ras Al Khaimah",
+    "type": "Villa",
+    "price": "250,000 AED/year",
+    "bedrooms": "6",
+    "bathrooms": "7",
+    "size": "5,000 sqft",
+    "listed": "16 days ago",
+    "status": "Available",
+    "link": "https://www.propertyfinder.ae/en/plp/rent/villa-for-rent-ras-al-khaimah-al-riffa-105123296.html"
+  },
+  {
+    "id": "prop-4",
+    "title": "Family Studio for Rent – Gated Compound | Al Refaa",
+    "location": "Al Riffa, Ras Al Khaimah",
+    "type": "Compound",
+    "price": "3,000 AED/month",
+    "bedrooms": "studio",
+    "bathrooms": "1",
+    "size": "500 sqft",
+    "listed": "1 month ago",
+    "status": "Reserved",
+    "link": "https://www.propertyfinder.ae/en/plp/rent/compound-for-rent-ras-al-khaimah-al-riffa-89205205.html"
+  },
+  {
+    "id": "prop-5",
+    "title": "Studio for Rent – Al Jazeerah Opposite ADNOC Pump",
+    "location": "Al Riffa, Ras Al Khaimah",
+    "type": "Apartment",
+    "price": "23,000 AED/year",
+    "bedrooms": "studio",
+    "bathrooms": "1",
+    "size": "500 sqft",
+    "listed": "1 month ago",
+    "status": "Offer",
+    "link": "https://www.propertyfinder.ae/en/plp/rent/apartment-for-rent-ras-al-khaimah-al-riffa-89201184.html"
+  },
+  {
+    "id": "prop-6",
+    "title": "Unfurnished 1Bedroom Unit – Ideal for Staff/Family",
+    "location": "Al Riffa, Ras Al Khaimah",
+    "type": "Compound",
+    "price": "25,000 AED/year",
+    "bedrooms": "1",
+    "bathrooms": "1",
+    "size": "650 sqft",
+    "listed": "1 month ago",
+    "status": "Available",
+    "link": "https://www.propertyfinder.ae/en/plp/rent/compound-for-rent-ras-al-khaimah-al-riffa-89198930.html"
+  }
+]
