@@ -77,7 +77,7 @@ export async function scoreLead(leadId: string): Promise<ScoreResult> {
       temperature,
       score,
       reasoning,
-      reportData: {
+      reportData: JSON.stringify({
         totalMessages,
         hotHits,
         warmHits,
@@ -85,7 +85,7 @@ export async function scoreLead(leadId: string): Promise<ScoreResult> {
         hasHandoff,
         hasEscalated,
         analyzedAt: new Date().toISOString(),
-      },
+      }),
     },
   });
 

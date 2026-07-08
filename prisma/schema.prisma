@@ -1,12 +1,10 @@
 generator client {
   provider = "prisma-client-js"
-  previewFeatures = ["postgresqlExtensions"]
 }
 
 datasource db {
-  provider   = "postgresql"
-  url        = env("DATABASE_URL")
-  extensions = [vector]
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 enum LeadSource {
@@ -31,7 +29,7 @@ model Lead {
   name         String?
   phone        String?
   whatsappId   String?       @unique
-  rawPayload   Json?
+  rawPayload   String?
   status       LeadStatus    @default(NEW)
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
@@ -86,7 +84,7 @@ model Message {
   sender         MessageSender
   agentType      AgentType?
   content        String
-  toolCallsJson  Json?
+  toolCallsJson  String?
   createdAt      DateTime         @default(now())
 
   conversation   Conversation @relation(fields: [conversationId], references: [id])
@@ -102,8 +100,7 @@ model Property {
   price        Float
   beds         Int?
   baths        Int?
-  embedding    Unsupported("vector")?
-  rawDataJson  Json?
+  rawDataJson  String?
   createdAt    DateTime               @default(now())
   updatedAt    DateTime               @updatedAt
 }
@@ -120,7 +117,7 @@ model LeadSummary {
   temperature  LeadTemperature
   score        Int?
   reasoning    String?
-  reportData   Json?           // Structured analytics & data validation
+  reportData   String?         // Structured analytics & data validation
   validatedBy  String?
   createdAt    DateTime        @default(now())
   updatedAt    DateTime        @updatedAt

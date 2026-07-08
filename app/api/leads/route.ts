@@ -60,7 +60,7 @@ export async function POST(request: Request) {
           phone,
           whatsappId: phone,
           source: source || "WEBSITE_FORM",
-          rawPayload: { email, message },
+          rawPayload: JSON.stringify({ email, message }),
         },
       });
     }
