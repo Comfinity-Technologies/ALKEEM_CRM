@@ -1,0 +1,189 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+enum LeadSource {
+  PROPERTY_FINDER
+  BAYUT
+  INSTAGRAM
+  WEBSITE_FORM
+  WHATSAPP
+  OTHER
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  LOST
+}
+
+model Lead {
+  id           String        @id @default(uuid())
+  source       LeadSource
+  name         String?
+  phone        String?
+  whatsappId   String?       @unique
+  rawPayload   String?
+  status       LeadStatus    @default(NEW)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  conversations Conversation[]
+  meetings      Meeting[]
+  leadSummaries LeadSummary[]
+}
+
+enum ConversationStatus {
+  ACTIVE
+  ESCALATED
+  CLOSED
+}
+
+model Conversation {
+  id          String             @id @default(uuid())
+  leadId      String
+  channel     String             @default("whatsapp")
+  status      ConversationStatus @default(ACTIVE)
+  assignedTo  String?
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  lead        Lead        @relation(fields: [leadId], references: [id])
+  messages    Message[]
+  meetings    Meeting[]
+  handoffs    Handoff[]
+}
+
+enum MessageDirection {
+  IN
+  OUT
+}
+
+enum MessageSender {
+  BOT
+  AGENT
+  CLIENT
+}
+
+enum AgentType {
+  ASSISTANT
+  AGENT
+  HUMAN
+}
+
+model Message {
+  id             String           @id @default(uuid())
+  conversationId String
+  direction      MessageDirection
+  sender         MessageSender
+  agentType      AgentType?
+  content        String
+  toolCallsJson  String?
+  createdAt      DateTime         @default(now())
+
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+}
+
+model Property {
+  id           String                 @id @default(uuid())
+  externalId   String?
+  source       String?
+  title        String
+  type         String
+  location     String
+  price        Float
+  beds         Int?
+  baths        Int?
+  rawDataJson  String?
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+}
+
+enum LeadTemperature {
+  HOT
+  WARM
+  COLD
+}
+
+model LeadSummary {
+  id           String          @id @default(uuid())
+  leadId       String
+  temperature  LeadTemperature
+  score        Int?
+  reasoning    String?
+  reportData   String?         // Structured analytics & data validation
+  validatedBy  String?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  lead         Lead @relation(fields: [leadId], references: [id])
+}
+
+enum MeetingStatus {
+  PROPOSED
+  CONFIRMED
+  CANCELLED
+}
+
+model Meeting {
+  id              String        @id @default(uuid())
+  leadId          String
+  conversationId  String
+  agentAssigned   String?
+  scheduledTime   DateTime?
+  status          MeetingStatus @default(PROPOSED)
+  calendarEventId String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  lead            Lead         @relation(fields: [leadId], references: [id])
+  conversation    Conversation @relation(fields: [conversationId], references: [id])
+}
+
+enum HandoffStatus {
+  PENDING
+  ACCEPTED
+  TIMED_OUT
+}
+
+model Handoff {
+  id                    String        @id @default(uuid())
+  conversationId        String
+  requestedAt           DateTime      @default(now())
+  assignedAgent         String?
+  status                HandoffStatus @default(PENDING)
+  fallbackMessageSent   Boolean       @default(false)
+
+  conversation          Conversation  @relation(fields: [conversationId], references: [id])
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  AGENT
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  role      UserRole @default(AGENT)
+  email     String   @unique
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  actor     String
+  action    String
+  entity    String
+  entityId  String
+  createdAt DateTime @default(now())
+}
