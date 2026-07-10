@@ -1,0 +1,44 @@
+{
+  "name": "al-alkeem-pms",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "postinstall": "prisma generate",
+    "db:push": "prisma db push",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:studio": "prisma studio",
+    "test:load": "node scripts/load-test.js",
+    "test:load:heavy": "node scripts/load-test.js http://localhost:3000 1000 20"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.9.0",
+    "@supabase/ssr": "^0.12.0",
+    "@supabase/supabase-js": "^2.110.1",
+    "bcryptjs": "^3.0.3",
+    "groq-sdk": "^0.12.0",
+    "lucide-react": "^0.475.0",
+    "next": "15.1.7",
+    "next-auth": "^4.24.11",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.1.7",
+    "prisma": "^6.9.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  }
+}
