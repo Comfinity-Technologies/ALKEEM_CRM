@@ -40,5 +40,5 @@ export default async function middleware(req: NextRequest) {
 
 // 4. Run the middleware on everything except static assets
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|login).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|login|simulator).*)"],
 };

@@ -1,9 +1,7 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "../api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import "./dashboard.css"; // bringing in the old styles for now
-
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   // snag the session
   const session = await getServerSession(authOptions);

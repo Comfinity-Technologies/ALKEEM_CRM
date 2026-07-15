@@ -1,7 +1,23 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
+import * as xlsx from 'xlsx';
 
 const prisma = new PrismaClient();
+
+function parsePrice(priceStr: string | number): number {
+  if (typeof priceStr === 'number') return priceStr;
+  if (!priceStr) return 0;
+  // Extract only digits
+  const match = priceStr.toString().replace(/,/g, '').match(/\d+/);
+  return match ? parseFloat(match[0]) : 0;
+}
+
+function parseIntSafe(val: any): number | null {
+  if (val === undefined || val === null || val === '') return null;
+  if (typeof val === 'number') return val;
+  const parsed = parseInt(val.toString().trim(), 10);
+  return isNaN(parsed) ? null : parsed;
+}
 
 async function main() {
   // hashing the admin password (admin123)
@@ -23,43 +39,39 @@ async function main() {
 
   console.log('✅ seeded the super admin account');
 
-  const properties = [
-    {
-      title: 'Spacious 1BR Apartment in Ajman Downtown',
-      type: 'Apartment',
-      location: 'Ajman Downtown',
-      price: 25000,
-      beds: 1,
-      baths: 2,
-      source: 'Internal'
-    },
-    {
-      title: 'Luxury 2BR with Sea View',
-      type: 'Apartment',
-      location: 'Corniche Ajman',
-      price: 45000,
-      beds: 2,
-      baths: 3,
-      source: 'Internal'
-    },
-    {
-      title: 'Affordable Studio in Al Rashidiya',
-      type: 'Studio',
-      location: 'Al Rashidiya',
-      price: 15000,
-      beds: 0,
-      baths: 1,
-      source: 'Internal'
-    }
-  ];
+  // Read properties from Excel
+  console.log('Reading properties from properties.xlsx...');
+  const workbook = xlsx.readFile('properties.xlsx');
+  const sheetName = workbook.SheetNames[0];
+  const sheet = workbook.Sheets[sheetName];
+  const rawData: any[] = xlsx.utils.sheet_to_json(sheet);
 
-  for (const property of properties) {
+  for (const row of rawData) {
+    const title = row['title']?.toString() || 'Untitled Property';
+    const type = row['type']?.toString() || 'Unknown';
+    const location = row['location']?.toString() || 'Unknown Location';
+    const price = parsePrice(row['price']);
+    const beds = parseIntSafe(row['bedrooms']);
+    const baths = parseIntSafe(row['bathrooms']);
+    const externalId = row['id']?.toString();
+    const source = 'Excel Import';
+    
     await prisma.property.create({
-      data: property,
+      data: {
+        title,
+        type,
+        location,
+        price,
+        beds,
+        baths,
+        externalId,
+        source,
+        rawDataJson: JSON.stringify(row),
+      },
     });
   }
 
-  console.log('✅ seeded the properties');
+  console.log(`✅ seeded ${rawData.length} properties from Excel`);
 }
 
 main()
