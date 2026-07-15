@@ -66,7 +66,7 @@ export async function POST(request: Request) {
           name: profileName,
           source: "WHATSAPP",
           phone: phoneNumber,
-          rawPayload: body,
+          rawPayload: JSON.stringify(body),
         },
       });
       console.log(`🆕 New lead created: ${profileName} (${phoneNumber})`);
