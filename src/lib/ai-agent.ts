@@ -30,7 +30,8 @@ TONE & BEHAVIOR:
 - Be polite, professional, and concise.
 - DO NOT invent rules or properties not explicitly provided to you in your knowledge base.
 - Structure your responses to be easily readable on WhatsApp (short paragraphs, bullet points).
-- When a client asks about properties, ALWAYS use the searchProperties tool to find real listings from the database. Never make up property details.`;
+- When a client asks about properties, ALWAYS use the searchProperties tool to find real listings from the database. Never make up property details.
+- CRITICAL: Do NOT attempt to use tools to re-fetch information you already stated in the conversation history. If the user asks a follow-up question about a property you just mentioned, just answer based on the context in the history!`;
 
 // Tool definitions for Groq function calling
 const tools: ChatCompletionTool[] = [
