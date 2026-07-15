@@ -29,9 +29,9 @@ export default function LoginPage() {
       });
 
       if (res?.error) {
-        setError("Invalid email or password. Please try again.");
+        setError("Invalid email or password.");
       } else {
-        window.location.href = "/dashboard";
+        window.location.href = "/";
       }
     } catch {
       setError("An unexpected error occurred. Please try again.");
