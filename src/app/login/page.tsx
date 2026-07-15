@@ -2,6 +2,7 @@
 
 import { signIn } from "next-auth/react";
 import { useState } from "react";
+import { Bot, Building2, BarChart3, Workflow } from "lucide-react";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -283,23 +284,23 @@ export default function LoginPage() {
           </h1>
           <p className="brand-subtitle">
             Your intelligent real estate operations platform. 
-            Manage leads, properties, and AI-powered client conversations — all in one place.
+            Manage leads, properties, and AI-powered client conversations all in one place.
           </p>
           <div className="brand-features">
             <div className="brand-feature">
-              <div className="brand-feature-icon">🤖</div>
+              <div className="brand-feature-icon"><Bot size={20} /></div>
               <span>AI-powered WhatsApp lead qualification</span>
             </div>
             <div className="brand-feature">
-              <div className="brand-feature-icon">🏢</div>
+              <div className="brand-feature-icon"><Building2 size={20} /></div>
               <span>20+ property listings with live search</span>
             </div>
             <div className="brand-feature">
-              <div className="brand-feature-icon">📊</div>
+              <div className="brand-feature-icon"><BarChart3 size={20} /></div>
               <span>Real-time lead scoring and analytics</span>
             </div>
             <div className="brand-feature">
-              <div className="brand-feature-icon">🔄</div>
+              <div className="brand-feature-icon"><Workflow size={20} /></div>
               <span>Automated bot-to-human handoff workflow</span>
             </div>
           </div>

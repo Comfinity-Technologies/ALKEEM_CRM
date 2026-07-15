@@ -620,7 +620,12 @@ export default function SimulatorPage() {
                   placeholder="Type a message..."
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && handleSend()}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSend();
+                    }
+                  }}
                 />
               </div>
               <button className="sim-send-btn" onClick={handleSend} disabled={loading || !message.trim()}>
