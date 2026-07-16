@@ -25,6 +25,7 @@
     "next-auth": "^4.24.11",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "recharts": "^3.9.2",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {

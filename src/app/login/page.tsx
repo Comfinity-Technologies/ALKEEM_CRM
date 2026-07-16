@@ -81,28 +81,24 @@ export default function LoginPage() {
           pointer-events: none;
         }
         .brand-logo {
-          width: 56px;
-          height: 56px;
-          background: linear-gradient(135deg, #2563EB, #3B82F6);
-          border-radius: 14px;
           display: flex;
           align-items: center;
-          justify-content: center;
-          color: white;
-          font-weight: 800;
-          font-size: 22px;
-          font-family: var(--font-display, system-ui);
-          box-shadow: 0 0 30px rgba(37, 99, 235, 0.3);
-          margin-bottom: 28px;
+          gap: 12px;
+          color: #3B82F6;
+          margin-bottom: 24px;
+        }
+        .brand-logo svg {
+          width: 48px;
+          height: 48px;
         }
         .brand-title {
           font-family: var(--font-display, system-ui);
-          font-size: 2.4rem;
+          font-size: 2.8rem;
           font-weight: 700;
           color: #F8FAFC;
           line-height: 1.15;
           letter-spacing: -0.02em;
-          margin-bottom: 12px;
+          margin-bottom: 16px;
         }
         .brand-subtitle {
           color: #94A3B8;
@@ -277,7 +273,9 @@ export default function LoginPage() {
       <div className="login-root">
         {/* ── Left branding ─────────────────────── */}
         <div className="login-brand">
-          <div className="brand-logo">AK</div>
+          <div className="brand-logo">
+            <Building2 size={48} />
+          </div>
           <h1 className="brand-title">
             Al Alkeem<br />
             Command Centre

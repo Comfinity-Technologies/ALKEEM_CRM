@@ -7,11 +7,14 @@ export default async function Page() {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
 
-  // The original HTML file is missing from the local repo, 
-  // so we use the JSX equivalent that your friend's previous developer saved.
+  const user = {
+    name: session.user.name || "User",
+    role: "Super Admin", // Fallback if missing
+  };
+
   return (
     <>
-      <RawDashboard />
+      <RawDashboard user={user} />
     </>
   );
 }

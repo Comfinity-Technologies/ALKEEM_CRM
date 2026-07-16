@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { processLeadMessage } from "@/lib/ai-agent";
+import { processLeadMessage, generateLeadSummary } from "@/lib/ai-agent";
 import { sendWhatsAppMessage } from "@/lib/whatsapp";
 
 /**
@@ -114,7 +114,7 @@ export async function POST(request: Request) {
     // ── 5. Get AI response ──────────────────────────────────────────────
     let aiReply: string;
     try {
-      aiReply = await processLeadMessage(history, messageBody, conversation.id);
+      aiReply = await processLeadMessage(history, messageBody, conversation.id, lead.name || "Client");
     } catch (aiError) {
       console.error("🤖 AI Agent Error:", aiError);
       aiReply =
@@ -143,6 +143,11 @@ export async function POST(request: Request) {
       console.error("📵 Failed to send WhatsApp reply:", sendError);
       // Message is saved to DB even if delivery fails — can retry later
     }
+
+    // ── 8. Asynchronously generate summary ──────────────────────────────
+    generateLeadSummary(lead.id, conversation.id).catch(err => {
+      console.error("Auto-summarization failed:", err);
+    });
 
     return new NextResponse("EVENT_RECEIVED", { status: 200 });
   } catch (error) {

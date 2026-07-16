@@ -6,32 +6,32 @@ const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY || "",
 });
 
-export const SYSTEM_PROMPT = `You are the official AI Assistant for Al Alkeem Group. Your name is Al Alkeem Group Assistant.
-Your primary role is to attend to leads, answer queries, match properties, and schedule viewings.
+export function getSystemPrompt(leadName: string) {
+  return `You are the exclusive AI Property Consultant for Al Alkeem Group, a premium real estate agency. 
+Your role is to act as a highly professional, polite, and sophisticated property advisor.
 
-STRICT BUSINESS RULES:
-1. Commission: We charge exactly 5% of the rent amount.
-2. Security Deposit: Exactly AED 3,000 or 10% of the rent amount (whichever is higher).
-3. Cheques: We require exactly 4 cheques for payment.
-4. FEWA (Electricity & Water): If asked, explain that it depends on the contract:
-   - Internal Contract (Real Estate Contract): FEWA is under our name.
-   - Municipality Contract: Contract and FEWA are under the tenant's name.
-5. Required Documents: Valid ID/Passport, Mobile number, Email Address, and Trade License (If needed).
+CONVERSATIONAL & QUALIFYING APPROACH:
+- Tone: Extremely professional, sophisticated, polite, and accommodating. Use elegant language but remain concise. 
+- Personalization: Always address the client warmly by their name, "${leadName}", especially when greeting them or summarizing their needs. Do not use their name in every single message, but use it thoughtfully to make them feel valued.
+- Keep your responses under 2-3 short sentences. Do not overwhelm the client.
+- CRITICAL PACING RULE: You must ONLY ask ONE short question at a time to keep the conversation flowing smoothly. Wait for their answer before asking the next question.
+- Seamless Qualification: Naturally weave questions into the conversation to uncover:
+  1. Property type (Apartment, Villa, Studio)
+  2. Budget range
+  3. Preferred location or community
+  4. Number of bedrooms
+  5. Move-in timeline
+- Once you have gathered 2 or 3 of these details, confidently use the \`searchProperties\` tool to find premium matches for them.
 
-VIEWING SLOTS:
-We only offer the following viewing slots: 9am-11am, 4pm-6pm, 8pm-10pm. 
-Offer these slots if a lead shows high interest (hot lead) and wants to book a viewing.
+PROPERTY MATCHING & PRESENTATION:
+- CRITICAL: Never invent properties. ALWAYS use the \`searchProperties\` tool to fetch real, exclusive listings from our database.
+- Present properties elegantly. For example: "I have found a stunning property that perfectly matches your criteria: [Title] in [Location] for [Price] AED."
+- If the client shows interest, politely offer to schedule a private viewing. Mention available slots (e.g., 9 AM - 11 AM, 4 PM - 6 PM).
 
-HUMAN HANDOFF:
-If a client specifically requests a human, gets frustrated, or has complex requirements outside your knowledge base, flag the conversation for a human handoff using the requestHumanHandoff tool.
-The handoff WhatsApp number is 0507443111.
-
-TONE & BEHAVIOR:
-- Be polite, professional, and concise.
-- DO NOT invent rules or properties not explicitly provided to you in your knowledge base.
-- Structure your responses to be easily readable on WhatsApp (short paragraphs, bullet points).
-- When a client asks about properties, ALWAYS use the searchProperties tool to find real listings from the database. Never make up property details.
-- CRITICAL: Do NOT attempt to use tools to re-fetch information you already stated in the conversation history. If the user asks a follow-up question about a property you just mentioned, just answer based on the context in the history!`;
+SYSTEM INSTRUCTIONS (DO NOT VIOLATE):
+- DO NOT output raw function tags like <function>...</function> in your text response. Only use the standard JSON tool calling mechanism.
+- Do NOT use tools to re-fetch properties you already mentioned if the user asks a follow-up question. Just answer based on context.`;
+}
 
 // Tool definitions for Groq function calling
 const tools: ChatCompletionTool[] = [
@@ -61,12 +61,12 @@ const tools: ChatCompletionTool[] = [
             description: "Maximum annual rent price in AED",
           },
           beds: {
-            type: "integer",
-            description: "Number of bedrooms",
+            type: "string",
+            description: "Number of bedrooms (e.g. '1', '2', 'studio')",
           },
           baths: {
-            type: "integer",
-            description: "Number of bathrooms",
+            type: "string",
+            description: "Number of bathrooms (e.g. '1', '2')",
           },
         },
       },
@@ -147,12 +147,48 @@ async function requestHumanHandoffInDb(args: any, conversationId: string) {
   }
 }
 
+// ── Safe Groq Wrapper ──────────────────────────────────────────────
+async function safeGroqChat(options: any) {
+  try {
+    return await groq.chat.completions.create(options);
+  } catch (error: any) {
+    const errStr = typeof error === 'object' ? JSON.stringify(error) + " " + error.message : String(error);
+    
+    if (errStr.includes("failed_generation") || errStr.includes("tool_use_failed")) {
+      console.warn("⚠️ Groq parser failed. Recovering gracefully.");
+      
+      let failedText = "I'm searching for the best matches right now, one moment please.";
+      
+      // Try to extract the actual failed generation if possible
+      if (error?.error?.error?.failed_generation) {
+        failedText = error.error.error.failed_generation;
+      } else if (error?.error?.failed_generation) {
+        failedText = error.error.failed_generation;
+      }
+      
+      return {
+        choices: [
+          {
+            finish_reason: "stop",
+            message: {
+              role: "assistant",
+              content: failedText,
+            },
+          },
+        ],
+      };
+    }
+    throw error;
+  }
+}
+
 // ── Main Entry Point ────────────────────────────────────────────────
 
 export async function processLeadMessage(
   conversationHistory: any[],
   newMessage: string,
-  conversationId: string
+  conversationId: string,
+  leadName: string = "Client"
 ) {
   if (!process.env.GROQ_API_KEY) {
     throw new Error("GROQ_API_KEY is not set in environment variables.");
@@ -160,7 +196,7 @@ export async function processLeadMessage(
 
   // Convert DB history to OpenAI-compatible message format
   const messages: ChatCompletionMessageParam[] = [
-    { role: "system", content: SYSTEM_PROMPT },
+    { role: "system", content: getSystemPrompt(leadName) },
     ...conversationHistory.map((msg) => ({
       role: (msg.sender === "CLIENT" ? "user" : "assistant") as "user" | "assistant",
       content: msg.content,
@@ -168,7 +204,7 @@ export async function processLeadMessage(
   ];
 
   // Initial completion request
-  let response = await groq.chat.completions.create({
+  let response = await safeGroqChat({
     model: "llama-3.3-70b-versatile",
     messages,
     tools,
@@ -209,7 +245,7 @@ export async function processLeadMessage(
     }
 
     // Get the next response (could be another tool call or final text)
-    response = await groq.chat.completions.create({
+    response = await safeGroqChat({
       model: "llama-3.3-70b-versatile",
       messages,
       tools,
@@ -220,5 +256,81 @@ export async function processLeadMessage(
     choice = response.choices[0];
   }
 
-  return choice.message.content || "I apologize, I was unable to generate a response. Please try again.";
+  const finalContent = choice.message.content || "I apologize, I was unable to generate a response. Please try again.";
+  
+  // Forcefully strip out any hallucinated <function>...</function> XML tags
+  const stripped = finalContent.replace(/<function[\s\S]*?<\/function>/g, '').trim();
+  
+  return stripped || "I'm searching for the best matches right now, one moment please.";
+}
+
+// ── Lead Summarization Pipeline ─────────────────────────────────────
+
+export async function generateLeadSummary(leadId: string, conversationId: string) {
+  try {
+    const history = await prisma.message.findMany({
+      where: { conversationId },
+      orderBy: { createdAt: "asc" },
+      select: { sender: true, content: true },
+    });
+
+    if (history.length < 2) return; // Not enough context to score
+
+    const summaryPrompt = `Analyze the following real estate conversation.
+    
+Based on the client's responses, score their readiness (0-100) and assign a temperature (HOT, WARM, COLD).
+- HOT: Ready to book viewing, high budget, immediate timeline.
+- WARM: Interested but still exploring, timeline > 1 month.
+- COLD: Unresponsive, budget too low, or just browsing.
+
+Conversation:
+${history.map(m => `${m.sender}: ${m.content}`).join("\n")}
+
+Respond ONLY with valid JSON in this exact format:
+{
+  "temperature": "HOT" | "WARM" | "COLD",
+  "score": 85,
+  "reasoning": "A 1-2 sentence explanation of why this score was given."
+}`;
+
+    const response = await groq.chat.completions.create({
+      model: "llama-3.3-70b-versatile",
+      messages: [{ role: "user", content: summaryPrompt }],
+      response_format: { type: "json_object" },
+      temperature: 0.1,
+    });
+
+    const content = response.choices[0]?.message?.content;
+    if (!content) return;
+
+    const data = JSON.parse(content);
+
+    // Upsert the LeadSummary
+    const existingSummary = await prisma.leadSummary.findFirst({
+      where: { leadId },
+    });
+
+    if (existingSummary) {
+      await prisma.leadSummary.update({
+        where: { id: existingSummary.id },
+        data: {
+          temperature: data.temperature,
+          score: data.score,
+          reasoning: data.reasoning,
+        },
+      });
+    } else {
+      await prisma.leadSummary.create({
+        data: {
+          leadId,
+          temperature: data.temperature,
+          score: data.score,
+          reasoning: data.reasoning,
+        },
+      });
+    }
+    console.log(`✅ Lead ${leadId} summarized successfully! [${data.temperature}]`);
+  } catch (err) {
+    console.error("❌ Failed to generate lead summary:", err);
+  }
 }
